@@ -81,9 +81,7 @@ def make_pretrain_loader(
         drop_last=drop_last,#drops last batch if imgs < 128
         pin_memory=pin_mem,
         num_workers=num_workers,
-        persistent_workers=True
-    )
-
+        persistent_workers=num_workers > 0)
     return dataset, loader, sampler
 
 #now transforms during eval
