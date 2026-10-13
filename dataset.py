@@ -15,6 +15,11 @@ logger = logging.getLogger("ijepa")
 IMAGENET_MEAN = (0.485, 0.456, 0.406)
 IMAGENET_STD = (0.229, 0.224, 0.225)
 
+DATASETS = {
+    'imagenet100': dict(crop_size=224, patch_size=16, splits=('train', 'train', 'val')),
+    'imagenet1k': dict(crop_size=224, patch_size=16, splits=('train', 'train', 'val')),
+    'stl10': dict(crop_size=96, patch_size=8, splits=('train+unlabeled', 'train', 'test')),
+}
 class GaussianBlur:
     def __init__(self, p=0.5, radius_min=0.1, radius_max=2.):
         self.prob = p
