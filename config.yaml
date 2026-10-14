@@ -1,5 +1,5 @@
 # I-JEPA on a Modal A100-80GB: ViT-B/16 on ImageNet-100 for 300 epochs (closer to the paper).
-# Run:  modal run --detach modal_app.py::train --args "--config config_modal.yaml"
+# Run:  modal run --detach modal_app.py::train
 
 dataset: imagenet100          # imagenet100 | imagenet1k | stl10
 model: vit_base               # vit_small | vit_base | vit_large | vit_huge | vit_giant
