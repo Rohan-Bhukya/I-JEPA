@@ -23,7 +23,7 @@ mask:
 train:
   epochs: 300                 # paper: 300 (ImageNet-1K)
   batch_size: 128             # paper: 2048 (16 GPUs x 128)
-  lr: 0.0005                  # paper: 0.001 at batch 2048
+  lr: 0.00025                  # paper: 0.001 at batch 2048
   start_lr: 0.0001            # paper: 0.0001
   final_lr: 1.0e-06
   warmup_epochs: 40           # paper: 40 of 300 epochs
