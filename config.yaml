@@ -1,0 +1,48 @@
+# I-JEPA on a Modal A100-80GB: ViT-B/16 on ImageNet-100 for 300 epochs (closer to the paper).
+# Run:  modal run --detach modal_app.py::train --args "--config config_modal.yaml"
+
+dataset: imagenet100          # imagenet100 | imagenet1k | stl10
+model: vit_base               # vit_small | vit_base | vit_large | vit_huge | vit_giant
+crop_size: 224               # null -> 224 (ImageNet), 96 (STL-10)
+patch_size: 16              # null -> 16 (ImageNet), 8 (STL-10). The paper's ViT-H uses 14.
+data_root: data               # datasets are read from data/<dataset>/
+output: runs/{dataset}_{arch}_ep{epochs}   # -> runs/imagenet100_vitb16_ep300
+
+predictor:
+  depth: 6                 # null -> paper: 6 (ViT-B), 12 (ViT-L/H), 16 (ViT-G); ViT-S: 6
+  width: 384            # null -> paper: 384; ViT-S (itself 384 wide, not in the paper): 192
+
+mask:
+  num_targets: 4
+  target_scale: [0.15, 0.2]   # each target block covers 15-20% of the image
+  target_aspect_ratio: [0.75, 1.5]
+  context_scale: [0.85, 1.0]  # context block, before the targets are removed
+  min_keep: 10
+  allow_overlap: false
+
+train:
+  epochs: 300                 # paper: 300 (ImageNet-1K)
+  batch_size: 128             # paper: 2048 (16 GPUs x 128)
+  lr: 0.0005                  # paper: 0.001 at batch 2048
+  start_lr: 0.0001            # paper: 0.0001
+  final_lr: 1.0e-06
+  warmup_epochs: 40           # paper: 40 of 300 epochs
+  weight_decay: 0.04          # increased to final_weight_decay along a cosine curve (as in the code)
+  final_weight_decay: 0.4
+  ema: [0.996, 1.0]           # target-encoder momentum, increased linearly
+  crop_scale: [0.3, 1.0]      # RandomResizedCrop, the only augmentation
+  bf16: true
+  gpu_memory_fraction: 0.8    # Windows only: ignored on Modal (see main.py)
+  num_workers: 14             # Modal gives 16 CPUs (modal_app.py); leave 2 for the main process
+  persistent_workers: true
+  log_every: 10
+  checkpoint_every: 50     # keep jepa-ep50, jepa-ep100, ... besides jepa-latest
+
+eval:
+  batch_size: 256
+  knn_k: 20
+  knn_temperature: 0.07
+  probe_epochs: 50
+  probe_batch_size: null
+  probe_lrs: [0.01, 0.05, 0.001]
+  probe_weight_decays: [0.0005, 0.0]
