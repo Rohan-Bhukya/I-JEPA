@@ -1,0 +1,10 @@
+# Tested with torch 2.13 / torchvision 0.28 (CUDA) and Python 3.14 on Windows.
+torch>=2.4
+torchvision>=0.19
+numpy
+pyyaml
+pillow
+# only for: python prepare_data.py --dataset imagenet100
+# pyarrow
+# only on your computer, to launch cloud runs:
+# modal
