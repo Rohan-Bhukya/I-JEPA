@@ -6,14 +6,14 @@ This project implements a self-supervised representation learning system based o
 
 
 ## Table of Contents
--Objective
+- Objective
 - Approach
--Dataset and preprocessing
--Architecture overview
--Results
--Applications
--Learning outcomes
--References
+- Dataset and preprocessing
+- Architecture overview
+- Results
+- Applications
+- Learning outcomes
+- References
 
 ## Results
 
