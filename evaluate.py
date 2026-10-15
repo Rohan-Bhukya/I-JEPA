@@ -1,12 +1,16 @@
+#Evaluate.py
+
 import argparse
 import itertools
 import logging
 import os
 import time
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import yaml
+
 from dataset import DATASETS, build_dataset, make_eval_loader, probe_train_transform, test_transform
 from utils import setup_logging, trunc_normal_
 from vit import make_encoder
@@ -15,32 +19,45 @@ logger = logging.getLogger('ijepa')
 
 
 def load_target_encoder(path, device):
-    ckpt = torch.load(path, map_location='cpu', weights_only=False)
+## make_encoder correct architecture --> load the saved weights ---> load appropriate parameter names --> freeze parameters --> return target encode in eval mode
+    ckpt = torch.load(path, map_location='cpu', weights_only=False) # path runs/jepa-latest.pth.tar
     cfg = ckpt['config']
-    encoder = make_encoder(cfg['model'], cfg['crop_size'], cfg['patch_size'])
+    encoder = make_encoder(cfg['model'], cfg['crop_size'], cfg['patch_size']) # building a neural network structure  and load the learned weights into that structure
+    # for k,v in ckpt['target_encoder'].items():
+    #    print(k)      k.removeprefix('module.') removes prefixes such as in module.blocks.0.attn.qkv.weight because new model doesn't expect it
+    # dict making with key and value v
     encoder.load_state_dict({k.removeprefix('module.'): v for k, v in ckpt['target_encoder'].items()})
     for p in encoder.parameters():
-        p.requires_grad = False
+        p.requires_grad = False # freeze  the encoder parameters can't be modified by gradient descent
     logger.info(f"loaded target encoder: {cfg['model']}/{cfg['patch_size']}, trained on {cfg['dataset']} "
                 f"for {ckpt['epoch']} epochs ({path})")
     return encoder.to(device).eval(), cfg
 
 
-@torch.no_grad()
+@torch.no_grad() # no grad tracking inside the function
+
 def features(encoder, imgs, bf16):
-    """(average-pooled last layer [B, D], last 4 layers average-pooled and concatenated [B, 4D])."""
+
+# imgs ---> patch_embedd + pos_embedd --> transformer block output ---> normalize the average of last 4 layers
+# we use bfloat16 during computation to reduce GPU memory usage and potentially speed up processing then to float for precise calculations
     with torch.autocast('cuda', dtype=torch.bfloat16, enabled=bf16):
         x = encoder.patch_embed(imgs) + encoder.pos_embed
         outs = []
         for blk in encoder.blocks:
-            x = blk(x)
-            outs.append(x)
+            x = blk(x)# output on 1 block is input of other
+            outs.append(x) # storing every output because we need to extract representations from all transformer
+        # average pooling over patch tokens
         pooled = [encoder.norm(o).float().mean(dim=1) for o in outs[-4:]]   # final LayerNorm on each
-    return pooled[-1], torch.cat(pooled, dim=1)
+        # for last 4 outputs of tranformer block mean is taken along dim 1 (B, N, D)-->(B,D)
+        # data type converted to float32 and outs are normalized earlier
+
+    return pooled[-1], torch.cat(pooled, dim=1) # torch.cat (B,D)-->(B,4D)
+
 
 
 @torch.no_grad()
 def extract(encoder, dataset, batch_size, num_workers, device, bf16):
+    # extract() repeatedly calls features() for every batch in the dataset, saves the outputs, and combines them into complete feature tensors.
     last, last4, labels = [], [], []
     for imgs, y in make_eval_loader(dataset, batch_size, False, num_workers):
         a, b = features(encoder, imgs.to(device, non_blocking=True), bf16)
@@ -51,38 +68,56 @@ def extract(encoder, dataset, batch_size, num_workers, device, bf16):
 
 
 # -- kNN
+#k-Nearest Neighbors (k-NN) checks whether images with similar learned embeddings belong to the same class.
+
 @torch.no_grad()
 def knn_accuracy(train_feats, train_labels, test_feats, test_labels, num_classes, k=20, temperature=0.07):
-    train_feats, test_feats = F.normalize(train_feats, dim=1), F.normalize(test_feats, dim=1)
-    k = min(k, len(train_feats))
+    
+    # train_feats : embeddings of training images
+    # k=20: use the 20 most similar training images to classify each test image.
+    #temperature=0.07: controls how strongly similarity affects each neighbor's vote.
+    
+    train_feats, test_feats = F.normalize(train_feats, dim=1), #F.normalize(test_feats, dim=1) # Normalizes every feature vector to have unit length , so similarity comparisons focus on direction of embeddings 
+
+    k = min(k, len(train_feats))   # k never exceeds the number of availabele training examples . if there are 10 neighbours instead of 20
     correct = 0
-    for i in range(0, len(test_feats), 256):
-        sims, idx = (test_feats[i:i + 256] @ train_feats.T).topk(k, dim=1)
-        votes = torch.zeros(len(sims), num_classes, device=sims.device)
+    for i in range(0, len(test_feats), 256): # processing test image in batches of 256
+        
+        sims, idx = (test_feats[i:i + 256] @ train_feats.T).topk(k, dim=1) # cosine similarity 
+        votes = torch.zeros(len(sims), num_classes, device=sims.device) 
         votes.scatter_add_(1, train_labels[idx], (sims / temperature).exp())   # similarity-weighted vote
         correct += (votes.argmax(1) == test_labels[i:i + 256]).sum().item()
     return 100. * correct / len(test_feats)
 
 
 # -- linear probe
-class LARS(torch.optim.Optimizer):
-    """LARS as in MAE's linear probing (util/lars.py): 1-D parameters (biases) get no weight decay
-    and no trust-ratio scaling."""
 
+## LARS is reused from MAE's linear -probing implementation for our I-JEPA evaluation . LARS is optimizer
+class LARS(torch.optim.Optimizer):
+
+    #One-dimensional parameters, usually biases, receive no weight decay.
+    #One-dimensional parameters also receive no trust-ratio scaling.
+    
     def __init__(self, params, lr=0, weight_decay=0, momentum=0.9, trust_coefficient=0.001):
-        super().__init__(params, dict(lr=lr, weight_decay=weight_decay, momentum=momentum,
+        super().__init__(params, dict(lr=lr, weight_decay=weight_decay, momentum=momentum,  #lr = 0 no learning rate 
                                       trust_coefficient=trust_coefficient))
 
+# gradients from backprop p.grad ---> Add weight decay ---> calculate trust ratio ---> Apply momentum --->Update classifier parameters
+
     @torch.no_grad()
+    # optimizer changes parameters directly, so we disable gradient tracking while performing those updates
     def step(self):
-        for g in self.param_groups:
+
+        for g in self.param_groups:  
             for p in g['params']:
-                dp = p.grad
+                dp = p.grad 
                 if dp is None:
                     continue
                 if p.ndim > 1:
                     dp = dp.add(p, alpha=g['weight_decay'])
                     param_norm, update_norm = torch.norm(p), torch.norm(dp)
+                    #param_norm: magnitude of the parameter tensor.
+                    # update_norm: magnitude of its adjusted gradient.
                     one = torch.ones_like(param_norm)
                     q = torch.where(param_norm > 0., torch.where(update_norm > 0,
                                     (g['trust_coefficient'] * param_norm / update_norm), one), one)
@@ -93,6 +128,7 @@ class LARS(torch.optim.Optimizer):
                 state['mu'].mul_(g['momentum']).add_(dp)
                 p.add_(state['mu'], alpha=-g['lr'])
 
+# make_head creates linear classifier that we train during linear probing while I-JEPA encoder frozen
 
 def make_head(dim, num_classes, batchnorm):
     linear = nn.Linear(dim, num_classes)
@@ -102,24 +138,33 @@ def make_head(dim, num_classes, batchnorm):
 
 
 def linear_probe(encoder, e, train_set, test_set, num_classes, device, bf16, num_workers):
-    batch = e['probe_batch_size'] or min(16384, max(64, round(len(train_set) / 78)))
+
+    # pre- extracted I-JEPA features --> Create multiple linear heads ---> Configure LARS and learning ratee milestones ---> train & evaluate heads 
+    batch = e['probe_batch_size'] or min(16384, max(64, round(len(train_set) / 78))) # if probe_batch_size 
     batch = min(batch, len(train_set))           # at least one step per epoch
     epochs = e['probe_epochs']
-    milestones = [round(epochs * f) for f in (0.3, 0.6, 0.9)]     # 15, 30, 45 for 50 epochs
+    milestones = [round(epochs * f) for f in (0.3, 0.6, 0.9)]     # 15, 30, 45 for 50 epochs learning rate will reduce by factor of 10 at these milestones 
     dim = encoder.embed_dim
+    # combes makes every possible combination of these choices . no of comb 2*2*2*2 =16
+
     combos = list(itertools.product(['last layer', 'last 4 layers'], [False, True],
                                     e['probe_lrs'], e['probe_weight_decays']))
-    heads = nn.ModuleList([make_head(dim if rep == 'last layer' else 4 * dim, num_classes, bn)
-                           for rep, bn, _, _ in combos]).to(device)
-    base_lrs = [blr * 16384 / 256 for _, _, blr, _ in combos]    
+    heads = nn.ModuleList([make_head(dim if rep == 'last layer' else 4 * dim, num_classes, bn)  # for lat layer dim else 4*dim  4 feature vectors concatenated
+                           for rep, bn, _, _ in combos]).to(device) # rep - representation (last layer / last 4 layer) bn indicates batch norm enabled(True)
+    
+    base_lrs = [blr * 16384 / 256 for _, _, blr, _ in combos]    # the paper's absolute learning rates
     optimizer = LARS([{'params': h.parameters(), 'lr': lr, 'weight_decay': wd}
                       for h, lr, (_, _, _, wd) in zip(heads, base_lrs, combos)])
+    
     logger.info(f'linear probe: {len(combos)} heads, batch {batch}, {epochs} epochs, '
                 f'lr / 10 at epochs {milestones}, {len(train_set) // batch} steps per epoch')
 
+
+# frozen I-JEPA encoder --> train multiple linear heads --> Evaluate on test features --> save the best head
+
     def step(last, last4, y):
-        # heads are independent, so one backward of the summed losses trains each on its own loss
-        loss = sum(F.cross_entropy(h(last if rep == 'last layer' else last4), y)
+        # heads are independent, so one backward of the summed losses trains each on its own loss combined loss helps for backward pass and calculate gradients for every classifer
+        loss = sum(F.cross_entropy(h(last if rep == 'last layer' else last4), y) # each classifier updates it loss
                    for h, (rep, _, _, _) in zip(heads, combos))
         optimizer.zero_grad()
         loss.backward()
@@ -157,6 +202,7 @@ def linear_probe(encoder, e, train_set, test_set, num_classes, device, bf16, num
 
 
 def main(argv=None):
+    # argparse lets you customize how evaluate.py runs through terminal arguments, instead of changing the source code every time.
     parser = argparse.ArgumentParser(description='kNN and linear-probe evaluation of an I-JEPA checkpoint')
     parser.add_argument('--checkpoint', required=True)
     parser.add_argument('--dataset', choices=list(DATASETS), help='default: the dataset the model was trained on')
@@ -218,3 +264,4 @@ def main(argv=None):
 
 if __name__ == '__main__':
     main()
+
