@@ -50,10 +50,10 @@ We performed Linear Probe and kNN over STL10 dataset on frozeen encoder, (5000 l
 
 ## References 
 
-1.[Official Meta AI blog](https://ai.meta.com/blog/yann-lecun-ai-model-i-jepa/)
-2.[I-JEPA Reaseach Paper](https://arxiv.org/pdf/2301.08243)
-3.[PyTorch Official Documentation](https://pytorch.org/)
-4.[Official implementation](https://github.com/facebookresearch/ijepa)
+1. [Official Meta AI blog](https://ai.meta.com/blog/yann-lecun-ai-model-i-jepa/)
+2. [I-JEPA Reaseach Paper](https://arxiv.org/pdf/2301.08243)
+3. [PyTorch Official Documentation](https://pytorch.org/)
+4. [Official implementation](https://github.com/facebookresearch/ijepa)
 
 
 ## Collaborators
