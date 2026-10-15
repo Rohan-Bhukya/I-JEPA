@@ -33,12 +33,12 @@ For STL10
 | **Domain** | **Application**|
 |--|--|
 
-|Medical Imaging | improve downstream clinical tasks like lesion detection, anatomical segmentation, and data augmentation|
-|Autonomous Systems |Learning visual representations for scene understanding and navigation|
-| Robotics|Filters noisy touch signals & predict object state('slopping', 'grasping')|
-|Cardiac Imaging|EchoJEPA: Learninng cardiac anatomy and dynamics from echocardiography|
-|Remote Sensing|Analyzing satellite and aerial imagery|
-| Image Retrieval | Learning representations for image and region retrieval|
+| Medical Imaging | improve downstream clinical tasks like lesion detection, anatomical segmentation, and data augmentation |
+| Autonomous Systems | Learning visual representations for scene understanding and navigation |
+| Robotics | Filters noisy touch signals & predict object state('slopping', 'grasping') |
+| Cardiac Imaging | EchoJEPA: Learninng cardiac anatomy and dynamics from echocardiography |
+| Remote Sensing| Analyzing satellite and aerial imagery |
+| Image Retrieval | Learning representations for image and region retrieval |
 
 ## Learning Outcomes 
 
@@ -57,7 +57,7 @@ For STL10
 4.[Official implementation](https://github.com/facebookresearch/ijepa)
 
 
-# Collaborators
+## Collaborators
 
 
 
