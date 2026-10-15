@@ -19,12 +19,13 @@ This project implements a self-supervised representation learning system based o
 
 We performed Linear Probe and kNN over STL10 dataset on frozeen encoder, (5000 labeled training images , 8000 test images)
 
-For STL10 
-|*model*||*probe-train*||*probe-test*||*kNN-test*|
-|--|--|--|--|
-|random-init||47.9|41.1|26.7|
-|jepa-ep10.pth.tar|78.8|60.4|51.3|
-|jepa-ep100.pth.tar|95.4|73.9|70.0|
+### STL-10 Evaluation Results
+
+| **Model** | **Probe Train (%)** | **Probe Test (%)** | **k-NN Test (%)** |
+|---|---:|---:|---:|
+| random-init | 47.9 | 41.1 | 26.7 |
+| jepa-ep10.pth.tar | 78.8 | 60.4 | 51.3 |
+| jepa-ep100.pth.tar | 95.4 | 73.9 | 70.0 |
 
 ![Description(tsne_comparison-1.png))]
 
