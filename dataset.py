@@ -20,7 +20,7 @@ DATASETS = {
 }
 
 class STL10(torch.utils.data.Dataset):
-    #which files belong to each split: (images file, labels file); unlabeled has no labels file
+
     FILES = {'train': [('train_X.bin', 'train_y.bin')],
              'test': [('test_X.bin', 'test_y.bin')],
              'train+unlabeled': [('train_X.bin', 'train_y.bin'), ('unlabeled_X.bin', None)]}
@@ -60,7 +60,6 @@ class STL10(torch.utils.data.Dataset):
         if self.transform:
             img = self.transform(img)
         return img, int(self.labels[index])
-
 
 #returns the dataset for one split: 'pretrain', 'eval_train' or 'eval_test'
 #each item is (image, label); the label is ignored during pre-training
@@ -105,8 +104,6 @@ def make_pretrain_loader(
         persistent_workers=persistent_workers and num_workers > 0)
     return loader, sampler
 
-
-#loader for evaluation: plain (image, label) batches, no masks.
 #shuffle=False when extracting features, so the features stay in the same order as the labels;
 #shuffle=True when training the linear probe.
 def make_eval_loader(dataset,batch_size,shuffle,num_workers):
@@ -120,8 +117,6 @@ def make_eval_loader(dataset,batch_size,shuffle,num_workers):
 
 
 #transforms during pre-training.
-#I-JEPA only uses a random crop: no flip, colour jitter or blur (the paper's point is that it does
-#not need hand-made augmentations), so those options of the original code are not here.
 def pretrain_transform(crop_size,crop_scale=(0.3, 1.0)):
     #this randomly crops 30-100% of the image and then resizes it to crop_size (224), this gives
     #different views of the images. like if we take an img with a dog and lots of grass, the crop may
@@ -131,16 +126,12 @@ def pretrain_transform(crop_size,crop_scale=(0.3, 1.0)):
         T.ToTensor(),                                #converts the image to a (3, 224, 224) tensor in [0, 1]
         T.Normalize(IMAGENET_MEAN, IMAGENET_STD)])
 
-
-#transforms for training the linear probe: random crop + horizontal flip (the VISSL / MAE recipe the
-#paper uses). only the small linear head is trained here, the encoder stays frozen.
 def probe_train_transform(crop_size):
     return T.Compose([
         T.RandomResizedCrop(crop_size, interpolation=T.InterpolationMode.BICUBIC),
         T.RandomHorizontalFlip(),
         T.ToTensor(),
         T.Normalize(IMAGENET_MEAN, IMAGENET_STD)])
-
 
 #now transforms during eval: no randomness, every image is processed the same way.
 #resize the shorter side to crop_size / 0.875 (256 for 224) and cut out the centre crop_size x crop_size.
