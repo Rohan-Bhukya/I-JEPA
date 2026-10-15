@@ -1,4 +1,4 @@
-import copy
+import copy # create a copy of encoder for target encoder
 import logging
 import math
 import os
@@ -14,9 +14,7 @@ from vit import build_models
 logger = logging.getLogger('ijepa')
 
 def make_optimizer(encoder, predictor):
-    """AdamW; weight decay only on weight matrices (not on biases / LayerNorm parameters).
-    lr and weight decay are set every step from the schedules in utils.py."""
-    def params(model, decay):
+    def params(model, decay):#selects which parameter should recieve weight decay
         return [p for n, p in model.named_parameters() if (('bias' not in n) and (len(p.shape) != 1)) == decay]
     return torch.optim.AdamW([{'params': params(encoder, True)}, {'params': params(predictor, True)},
                               {'params': params(encoder, False), 'WD_exclude': True, 'weight_decay': 0},
@@ -29,7 +27,6 @@ def set_lr_wd(optimizer, lr, wd):
         if not g.get('WD_exclude'):
             g['weight_decay'] = wd
 
-
 #one training step
 
 def train_step(encoder, predictor, target_encoder, optimizer, scaler, imgs, masks_enc, masks_pred, bf16):
@@ -41,7 +38,7 @@ def train_step(encoder, predictor, target_encoder, optimizer, scaler, imgs, mask
             h = repeat_interleave_batch(h, len(imgs), repeat=len(masks_enc))
         z = encoder(imgs, masks_enc)                         # [B, K_enc, D] context only
         z = predictor(z, masks_enc, masks_pred)              # [4B, K_pred, D] predictions
-        loss = F.smooth_l1_loss(z, h)
+        loss = F.mse_loss(z, h)
     if scaler is not None:
         scaler.scale(loss).backward()
         scaler.step(optimizer)
@@ -74,13 +71,10 @@ def train(cfg, device, resume=False, on_epoch_end=None):
     collator = MaskCollator(cfg['crop_size'], cfg['patch_size'], tuple(mk['context_scale']),
                             tuple(mk['target_scale']), tuple(mk['target_aspect_ratio']), nenc=1,
                             npred=mk['num_targets'], min_keep=mk['min_keep'], allow_overlap=mk['allow_overlap'])
-    dataset = build_dataset(cfg['dataset'], cfg['data_root'], 'pretrain',
-                            pretrain_transform(cfg['crop_size'], tuple(t['crop_scale'])))
-    loader, sampler = make_pretrain_loader(dataset, collator, t['batch_size'], t['num_workers'],
-                                           t['persistent_workers'])
+    dataset = build_dataset(cfg['dataset'], cfg['data_root'], 'pretrain', pretrain_transform(cfg['crop_size'], tuple(t['crop_scale'])))
+    loader, sampler = make_pretrain_loader(dataset, collator, t['batch_size'], t['num_workers'], t['persistent_workers'])
     ipe = len(loader)
     logger.info(f'{len(dataset)} images, {ipe} iterations per epoch')
-
     optimizer = make_optimizer(encoder, predictor)
     scaler = torch.amp.GradScaler('cuda') if bf16 else None   # not needed for bf16, kept as in the original
 
