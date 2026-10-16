@@ -44,7 +44,7 @@ This project implements a self-supervised representation learning system based o
     - Used the unlabeled split (100,000 images) for pretraining, with no labels required.
     - Used the labeled train/test splits (5,000 / 8,000 images) only for downstream evaluation.
 - Image Preprocessing
-    - Applied light augmentation: random resized cropping and horizontal flipping. I-JEPA does not rely on heavy hand-crafted augmentations such as color jitter or rotation, since the masking strategy provides the learning signal.
+    - Applied light augmentation: random resized cropping . I-JEPA does not rely on heavy hand-crafted augmentations such as color jitter or rotation, since the masking strategy provides the learning signal.
     - Converted images to tensors and normalized them to the range [-1, 1].
 -  Patchification
     - Split each image into non-overlapping patches (e.g., 8×8 for 96×96 images, giving a 12×12 grid of 144 patches or 16x16 for 224x224 images, 196 patches).
@@ -54,10 +54,14 @@ This project implements a self-supervised representation learning system based o
     - Sampled one large context block and several (typically 4) target blocks per image, using predefined scale and aspect-ratio ranges.
     - Removed any overlap between the context block and target blocks, so the target regions are never visible to the context encoder.
     - Produced index tensors for context patches and target patches, saved per sample.
-- Data Loader
+- Data Loader and Collator
     - Returned (image, context mask indices, target mask indices) per sample for pretraining.
     - Implemented a MaskCollator to handle varying numbers of context and target patches across samples by cropping to the minimum count in the batch, so tensors can be stacked.
-    - Used a standard (image, label) loader for linear probing and evaluation, with no masking applied.
+- Evaluation Data
+    - Used the labeled STL-10 training and test splits (5,000 and 8,000 images) for downstream evaluation.
+    - Also supported ImageNet-100, a 100-class subset of ImageNet, for evaluating the learned visual representations on a larger and more diverse dataset.
+    - Used the pretrained encoder to extract image representations and evaluated them using a linear classifier trained on labeled data.
+    - Kept labels out of self-supervised pretraining; labels were used only for downstream evaluation.
 
 ## Architecture Overview
 
