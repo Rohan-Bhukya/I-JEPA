@@ -1,7 +1,7 @@
 # Self-Supervised Visual Understanding from  Masked Images( I-JEPA)
 
 ## Overview 
-This project implements a self-supervised representation learning system based on the *Image-based Joint-Embedding Predictive Architecture (I-JEPA)*. The system learns rich visual representations by predicting the representations of masked target regions of an image from a single context block, operating entirely in latent/embedding space rather than pixel space.
+This project implements a self-supervised representation learning system based on the *Image-based Joint-Embedding Predictive Architecture (I-JEPA)*. The system learns rich visual representations by predicting the representations of masked target regions from a single context block, operating entirely in latent/embedding space rather than pixel space.
 
 
 ## Table of Contents
@@ -90,23 +90,25 @@ Context Representations + Positional Mask Tokens → Predictor → Predicted Tar
 **Context Encoder (ViT)**
 - Vision Transformer (e.g., ViT-Small or ViT-Base) trained from scratch on the STL-10 unlabeled split.
 - Splits the 96×96 image into 8×8 patches and adds positional embeddings.
-- Processes **only the visible context patches** through transformer blocks.
+- Processes only the visible context patches through transformer blocks.
 - Outputs a context representation for each visible patch.
 
 **Target Encoder (ViT)**
 - Identical architecture to the context encoder.
-- Weights are an **Exponential Moving Average (EMA)** of the context encoder, with no gradient updates.
-- Processes the **full image** and outputs patch-level representations.
+- Weights are an Exponential Moving Average (EMA) of the context encoder, with no gradient updates.
+- Processes the full image and outputs patch-level representations.
 - Representations at the target block locations serve as the prediction targets.
 
 **Predictor (Narrow ViT)**
 - Lightweight transformer with a smaller embedding dimension and fewer layers than the encoders.
-- Takes context representations plus learnable **mask tokens** carrying the positional embeddings of the target patches.
+- Takes context representations plus learnable mask tokens carrying the positional embeddings of the target patches.
 - Outputs predicted representations for each target patch.
 
 ### Intuitive Explanation
 
-The model learns to "fill in the blanks" in **representation space** rather than pixel space. Given a partial view of an image (the context), it predicts what the abstract features of the hidden regions (the targets) should look like. For example, if the context shows the body and legs of a horse, the predictor should produce an embedding for the hidden head region that is semantically consistent with "horse head", without needing to reconstruct exact pixels, textures, or colors. This pushes the encoder toward high-level semantics instead of low-level detail.
+The model learns to "fill in the blanks" in representation space rather than pixel space. Given a partial view of an image (the context), it predicts what the abstract features of the hidden regions (the targets) should look like. For example, if the context shows the body and legs of a horse, the predictor should produce an embedding for the hidden head region that is semantically consistent with "horse head", without needing to reconstruct exact pixels, textures, or colors. This pushes the encoder toward high-level semantics instead of low-level detail.
+
+![I-JEPA pretraining curves](Images_added/I-JEPA_pretraining_curves.png)
 
 ### Our Training Curve
 ![I-JEPA Architecture](Images_added/I-JEPA_pretraining_curves.png)
@@ -177,7 +179,7 @@ This ensures that the predicted embeddings of masked regions match the target en
 ## Downstream Evaluation Model
 
 **Linear Probe**
-- The pretrained target (or context) encoder is **frozen**.
+- The pretrained target (or context) encoder is frozen.
 - Patch representations are average-pooled into one global image vector.
 - A single linear layer maps the vector to the 10 STL-10 (or 1000 ImageNet) classes.
 - Trained with cross-entropy on the labeled training images and evaluated on the test images.
@@ -204,8 +206,8 @@ This ensures that the predicted embeddings of masked regions match the target en
 ## Learning Outcomes 
 
 - Developed a Functional I-JEPA model that learns visual representations through self-supervised joint-embedding prediction.
-- Implementated context encoder, EMA-updated target encoder, and predictor network.
-- Implementated multi-block masking strategy and latent-space prediction objective.
+- Implemented context encoder, EMA-updated target encoder, and predictor network.
+- Implemented multi-block masking strategy and latent-space prediction objective.
 - Pretraining pipeline producing transferable representations without labelled data
 -Developed understanding about SSL, JEPA, ViT, EMA teacher-student training, masking strategies, latent-space prediction code implementation and evaluation.
 
