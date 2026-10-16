@@ -1,7 +1,7 @@
-# Self-Supervised Visual Understanding from  Masked Images( I-JEPA)
+# Self-Supervised Visual Understanding from  Masked Images (I-JEPA)
 
 ## Overview 
-This project implements a self-supervised representation learning system based on the *Image-based Joint-Embedding Predictive Architecture (I-JEPA)*. The system learns rich visual representations by predicting the representations of masked target regions from a single context block, operating entirely in latent/embedding space rather than pixel space.
+This project implements a self-supervised representation learning system based on the *Image-based Joint-Embedding Predictive Architecture (I-JEPA)*. The system learns rich visual representations by predicting masked target regions from a single context block, operating entirely in latent/embedding space rather than pixel space.
 
 
 ## Table of Contents
@@ -23,7 +23,7 @@ This project implements a self-supervised representation learning system based o
 ## Dataset and Preprocessing
 
 ### Dataset:
-1.  **Source:** STL-10 ,  designed specifically for unsupervised and self-supervised representation learning.
+1.  **Source:** STL-10,  designed specifically for unsupervised and self-supervised representation learning.
 - **Structure:** The dataset contains 113,000 color images at 96×96 resolution, split as follows:
     - Unlabeled set: 100,000 images used for self-supervised pretraining (I-JEPA training, no labels needed).
     - Training set: 5,000 labeled images (500 per class, 10 classes) used for linear probing and fine-tuning.
@@ -44,7 +44,7 @@ This project implements a self-supervised representation learning system based o
     - Used the unlabeled split (100,000 images) for pretraining, with no labels required.
     - Used the labeled train/test splits (5,000 / 8,000 images) only for downstream evaluation.
 - Image Preprocessing
-    - Applied light augmentation: random resized cropping . I-JEPA does not rely on heavy hand-crafted augmentations such as color jitter or rotation, since the masking strategy provides the learning signal.
+    - Applied light augmentation: random resized cropping. I-JEPA does not rely on heavy hand-crafted augmentations such as color jitter or rotation, since the masking strategy provides the learning signal.
     - Converted images to tensors and normalized them to the range [-1, 1].
 -  Patchification
     - Split each image into non-overlapping patches (e.g., 8×8 for 96×96 images, giving a 12×12 grid of 144 patches or 16x16 for 224x224 images, 196 patches).
@@ -107,11 +107,6 @@ Context Representations + Positional Mask Tokens → Predictor → Predicted Tar
 ### Intuitive Explanation
 
 The model learns to "fill in the blanks" in representation space rather than pixel space. Given a partial view of an image (the context), it predicts what the abstract features of the hidden regions (the targets) should look like. For example, if the context shows the body and legs of a horse, the predictor should produce an embedding for the hidden head region that is semantically consistent with "horse head", without needing to reconstruct exact pixels, textures, or colors. This pushes the encoder toward high-level semantics instead of low-level detail.
-
-![I-JEPA pretraining curves](Images_added/I-JEPA_pretraining_curves.png)
-
-### Our Training Curve
-![I-JEPA Architecture](Images_added/I-JEPA_pretraining_curves.png)
 
 ### Mathematical Formulation
 
@@ -206,16 +201,16 @@ This ensures that the predicted embeddings of masked regions match the target en
 ## Learning Outcomes 
 
 - Developed a Functional I-JEPA model that learns visual representations through self-supervised joint-embedding prediction.
-- Implemented context encoder, EMA-updated target encoder, and predictor network.
-- Implemented multi-block masking strategy and latent-space prediction objective.
+- Implemented a context encoder, EMA-updated target encoder, and predictor network.
+- Implemented a multi-block masking strategy and latent-space prediction objective.
 - Pretraining pipeline producing transferable representations without labelled data
--Developed understanding about SSL, JEPA, ViT, EMA teacher-student training, masking strategies, latent-space prediction code implementation and evaluation.
+-Developed understanding of SSL, JEPA, ViT, EMA teacher-student training, masking strategies, latent-space prediction code implementation, and evaluation.
 
 
 ## References 
 
 1. [Official Meta AI blog](https://ai.meta.com/blog/yann-lecun-ai-model-i-jepa/)
-2. [I-JEPA Reaseach Paper](https://arxiv.org/pdf/2301.08243)
+2. [I-JEPA Research Paper](https://arxiv.org/pdf/2301.08243)
 3. [PyTorch Official Documentation](https://pytorch.org/)
 4. [Official implementation](https://github.com/facebookresearch/ijepa)
 
