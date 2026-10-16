@@ -108,6 +108,9 @@ Context Representations + Positional Mask Tokens → Predictor → Predicted Tar
 
 The model learns to "fill in the blanks" in **representation space** rather than pixel space. Given a partial view of an image (the context), it predicts what the abstract features of the hidden regions (the targets) should look like. For example, if the context shows the body and legs of a horse, the predictor should produce an embedding for the hidden head region that is semantically consistent with "horse head", without needing to reconstruct exact pixels, textures, or colors. This pushes the encoder toward high-level semantics instead of low-level detail.
 
+### Our Training Curve
+![I-JEPA Architecture](Images_added/I-JEPA_pretraining_curves.png)
+
 ### Mathematical Formulation
 
 **Context Encoder:**
