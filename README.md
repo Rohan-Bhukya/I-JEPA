@@ -112,38 +112,61 @@ The model learns to "fill in the blanks" in **representation space** rather than
 
 **Context Encoder:**
 
-$$s_x = f_\theta(x_{\text{context}})$$
+```math
+s_x = f_\theta(x_{\text{context}})
+```
 
 **Target Encoder (EMA):**
 
-$$s_y = \text{sg}\big(\bar{f}_{\bar\theta}(y)\big), \qquad \bar\theta \leftarrow m\,\bar\theta + (1-m)\,\theta$$
+```math
+s_y = \operatorname{sg}(f_{\bar{\theta}}(y))
+```
 
-where $\text{sg}(\cdot)$ is the stop-gradient operator and $m$ is the EMA momentum (typically close to 1, e.g., 0.996 → 1.0).
+The target encoder parameters are updated using Exponential Moving Average (EMA):
+
+```math
+\bar{\theta} \leftarrow m\bar{\theta} + (1-m)\theta
+```
+
+where `sg(·)` is the stop-gradient operator and \(m\) is the EMA momentum, typically close to 1 (e.g., increasing from 0.996 to 1.0).
 
 **Predictor:**
 
-$$\hat{s}_y(i) = g_\phi\big(s_x,\ \{m_j\}_{j \in B_i}\big)$$
+```math
+\hat{s}_y^{(i)} = g_\phi(s_x, m_j \mid j \in B_i)
+```
 
-where $B_i$ is the $i$-th target block and $m_j$ are mask tokens with positional embeddings for patch $j$.
+The predictor uses the context representations and mask tokens with positional embeddings to predict the representations of the target regions.
 
-**Loss Function (Smooth L1 Latent Prediction Loss):**
+Here, \(B_i\) is the \(i\)-th target block, and \(m_j\) represents a mask token associated with target patch \(j\).
 
-$$\mathcal{L}(\theta,\phi) = \frac{1}{M}\sum_{i=1}^{M}\ \sum_{j \in B_i} \text{smooth}_{L1}\big(\hat{s}_y(j) - s_y(j)\big)$$
+**Loss Function (L2 Latent Prediction Loss):**
 
-where the smooth L1 function is applied element-wise over the embedding dimensions:
+```math
+\mathcal{L}(\theta,\phi)
+=
+\frac{1}{M}
+\sum_{i=1}^{M}
+\frac{1}{|B_i|D}
+\sum_{j \in B_i}
+\left\|
+\hat{s}_y^{(j)} - s_y^{(j)}
+\right\|_2^2
+```
 
-$$
-\text{smooth}_{L1}(z) =
-\begin{cases}
-\dfrac{1}{2\beta} z^2, & \text{if } |z| < \beta \\[6pt]
-|z| - \dfrac{\beta}{2}, & \text{otherwise}
-\end{cases}
-$$
+where:
 
-and summed over the $D$ embedding dimensions of each patch. Here $M$ is the number of target blocks (typically 4) and $\beta$ is the transition threshold (default $\beta = 1$).
+- \(M\) is the number of target blocks (typically 4).
+- \(B_i\) is the set of patches in target block \(i\).
+- \(D\) is the embedding dimension.
+- \(\hat{s}_y^{(j)}\) is the predicted representation of target patch \(j\).
+- \(s_y^{(j)}\) is the corresponding target encoder representation.
 
-Smooth L1 behaves like L2 for small errors (smooth gradients near zero) and like L1 for large errors (less sensitive to outliers), which makes training more stable.
+L2 loss measures the squared difference between predicted and target embeddings. Larger errors receive a stronger penalty because the error is squared.
 
+The objective is to make the predicted embeddings of masked regions match the target encoder's embeddings. This encourages the context encoder to learn useful visual representations by capturing relationships between visible and masked regions.
+
+The asymmetric architecture, predictor, stop-gradient operation, and EMA target encoder help stabilize representation learning without requiring negative samples.
 This ensures that the predicted embeddings of masked regions match the target encoder's embeddings of those regions, forcing the context encoder to capture meaningful semantic structure. Collapse is avoided through the asymmetric design (predictor + EMA + stop-gradient) rather than negative samples.
 
 ---
