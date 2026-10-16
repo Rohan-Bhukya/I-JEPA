@@ -159,8 +159,8 @@ where:
 - \(M\) is the number of target blocks (typically 4).
 - \(B_i\) is the set of patches in target block \(i\).
 - \(D\) is the embedding dimension.
-- \(\hat{s}_y^{(j)}\) is the predicted representation of target patch \(j\).
-- \(s_y^{(j)}\) is the corresponding target encoder representation.
+- \$$\hat{s}_y^{(j)}$$ is the predicted representation of target patch \(j\).
+- \$$s_y^{(j)}$$ is the corresponding target encoder representation.
 
 L2 loss measures the squared difference between predicted and target embeddings. Larger errors receive a stronger penalty because the error is squared.
 
@@ -187,17 +187,6 @@ This ensures that the predicted embeddings of masked regions match the target en
 
 ## Results
 
-We performed Linear Probe and kNN over STL10 dataset on frozeen encoder, (5000 labeled training images , 8000 test images)
-
-### STL-10 Evaluation Results
-
-| **Model** | **Probe Train (%)** | **Probe Test (%)** | **k-NN Test (%)** |
-|---|---:|---:|---:|
-| random-init | 47.9 | 41.1 | 26.7 |
-| jepa-ep10.pth.tar | 78.8 | 60.4 | 51.3 |
-| jepa-ep100.pth.tar | 95.4 | 73.9 | 70.0 |
-
-![Description(tsne_comparison-1.png))]
 
 ## Applications
 
