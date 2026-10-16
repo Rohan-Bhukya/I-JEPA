@@ -119,7 +119,7 @@ s_x = f_\theta(x_{\text{context}})
 **Target Encoder (EMA):**
 
 ```math
-s_y = \operatorname{sg}(f_{\bar{\theta}}(y))
+$$s_y = \mathrm{sg}(f_{\bar{\theta}}(y))$$
 ```
 
 The target encoder parameters are updated using Exponential Moving Average (EMA):
