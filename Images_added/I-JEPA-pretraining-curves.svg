@@ -1,0 +1,184 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2200" height="800" viewBox="0 0 2200 800" role="img" aria-label="I-JEPA pre-training curves">
+  <defs>
+    <style>
+      .title { font: 600 34px 'DejaVu Sans', Arial, sans-serif; fill: #1a1a1a; }
+      .panel-title { font: 500 20px 'DejaVu Sans', Arial, sans-serif; fill: #1a1a1a; }
+      .axis-label { font: 500 18px 'DejaVu Sans', Arial, sans-serif; fill: #1a1a1a; }
+      .tick { font: 400 15px 'DejaVu Sans', Arial, sans-serif; fill: #444; }
+      .grid { stroke: #b7b7b7; stroke-width: 1; }
+      .axis { stroke: #6c6c6c; stroke-width: 1.2; }
+      .line { fill: none; stroke: #1f77b4; stroke-width: 2.5; }
+      .area { fill: rgba(31,119,180,0.12); }
+      .dash { stroke: #4a4a4a; stroke-width: 1.8; stroke-dasharray: 7 7; }
+    </style>
+  </defs>
+
+  <rect width="2200" height="800" fill="#f4f4f4"/>
+
+  <text x="1100" y="42" text-anchor="middle" class="title">I-JEPA pre-training curves (vit_small, 96x96, patch 8)</text>
+
+  <g transform="translate(35,80)">
+    <text x="250" y="0" text-anchor="middle" class="panel-title">Pre-training loss (mean ± std per epoch)</text>
+    <rect x="0" y="25" width="620" height="370" fill="none" stroke="#8a8a8a" stroke-width="1"/>
+
+    <g class="grid">
+      <line x1="70" y1="70" x2="570" y2="70"/>
+      <line x1="70" y1="120" x2="570" y2="120"/>
+      <line x1="70" y1="170" x2="570" y2="170"/>
+      <line x1="70" y1="220" x2="570" y2="220"/>
+      <line x1="70" y1="270" x2="570" y2="270"/>
+      <line x1="70" y1="320" x2="570" y2="320"/>
+      <line x1="70" y1="370" x2="570" y2="370"/>
+      <line x1="70" y1="70" x2="70" y2="370"/>
+      <line x1="120" y1="70" x2="120" y2="370"/>
+      <line x1="170" y1="70" x2="170" y2="370"/>
+      <line x1="220" y1="70" x2="220" y2="370"/>
+      <line x1="270" y1="70" x2="270" y2="370"/>
+      <line x1="320" y1="70" x2="320" y2="370"/>
+      <line x1="370" y1="70" x2="370" y2="370"/>
+      <line x1="420" y1="70" x2="420" y2="370"/>
+      <line x1="470" y1="70" x2="470" y2="370"/>
+      <line x1="520" y1="70" x2="520" y2="370"/>
+      <line x1="570" y1="70" x2="570" y2="370"/>
+    </g>
+
+    <g class="axis">
+      <line x1="70" y1="70" x2="570" y2="70"/>
+      <line x1="70" y1="70" x2="70" y2="370"/>
+      <line x1="70" y1="370" x2="570" y2="370"/>
+      <line x1="570" y1="70" x2="570" y2="370"/>
+    </g>
+
+    <path class="area" d="M70,296 L93,254 L116,222 L143,202 L176,191 L208,186 L238,182 L271,176 L296,171 L323,167 L352,164 L382,160 L418,156 L452,152 L488,149 L522,145 L570,142 L570,370 L70,370 Z"/>
+    <path class="line" d="M70,296 L93,254 L116,222 L143,202 L176,191 L208,186 L238,182 L271,176 L296,171 L323,167 L352,164 L382,160 L418,156 L452,152 L488,149 L522,145 L570,142"/>
+
+    <g class="tick">
+      <text x="70" y="390" text-anchor="middle">20</text>
+      <text x="170" y="390" text-anchor="middle">40</text>
+      <text x="270" y="390" text-anchor="middle">60</text>
+      <text x="370" y="390" text-anchor="middle">80</text>
+      <text x="470" y="390" text-anchor="middle">100</text>
+      <text x="570" y="390" text-anchor="middle">120</text>
+      <text x="18" y="374" text-anchor="end">0.100</text>
+      <text x="18" y="322" text-anchor="end">0.150</text>
+      <text x="18" y="270" text-anchor="end">0.200</text>
+      <text x="18" y="218" text-anchor="end">0.250</text>
+      <text x="18" y="167" text-anchor="end">0.300</text>
+      <text x="18" y="113" text-anchor="end">0.350</text>
+      <text x="18" y="70" text-anchor="end">0.400</text>
+    </g>
+
+    <text x="290" y="430" text-anchor="middle" class="axis-label">Epoch</text>
+    <text x="-210" y="-35" transform="rotate(-90)" text-anchor="middle" class="axis-label">smooth L1 loss</text>
+  </g>
+
+  <g transform="translate(700,80)">
+    <text x="250" y="0" text-anchor="middle" class="panel-title">LR schedule (warmup → cosine decay, from config)</text>
+    <rect x="0" y="25" width="620" height="370" fill="none" stroke="#8a8a8a" stroke-width="1"/>
+
+    <g class="grid">
+      <line x1="70" y1="70" x2="570" y2="70"/>
+      <line x1="70" y1="120" x2="570" y2="120"/>
+      <line x1="70" y1="170" x2="570" y2="170"/>
+      <line x1="70" y1="220" x2="570" y2="220"/>
+      <line x1="70" y1="270" x2="570" y2="270"/>
+      <line x1="70" y1="320" x2="570" y2="320"/>
+      <line x1="70" y1="370" x2="570" y2="370"/>
+      <line x1="70" y1="70" x2="70" y2="370"/>
+      <line x1="120" y1="70" x2="120" y2="370"/>
+      <line x1="170" y1="70" x2="170" y2="370"/>
+      <line x1="220" y1="70" x2="220" y2="370"/>
+      <line x1="270" y1="70" x2="270" y2="370"/>
+      <line x1="320" y1="70" x2="320" y2="370"/>
+      <line x1="370" y1="70" x2="370" y2="370"/>
+      <line x1="420" y1="70" x2="420" y2="370"/>
+      <line x1="470" y1="70" x2="470" y2="370"/>
+      <line x1="520" y1="70" x2="520" y2="370"/>
+      <line x1="570" y1="70" x2="570" y2="370"/>
+    </g>
+
+    <g class="axis">
+      <line x1="70" y1="70" x2="570" y2="70"/>
+      <line x1="70" y1="70" x2="70" y2="370"/>
+      <line x1="70" y1="370" x2="570" y2="370"/>
+      <line x1="570" y1="70" x2="570" y2="370"/>
+    </g>
+
+    <line x1="396" y1="70" x2="396" y2="370" class="dash"/>
+    <path class="line" d="M70,70 L90,140 L110,210 L140,260 L180,306 L220,344 L250,362 L270,370 L320,370 L370,350 L420,300 L470,220 L520,120 L570,70"/>
+
+    <g class="tick">
+      <text x="70" y="390" text-anchor="middle">20</text>
+      <text x="170" y="390" text-anchor="middle">40</text>
+      <text x="270" y="390" text-anchor="middle">60</text>
+      <text x="370" y="390" text-anchor="middle">80</text>
+      <text x="470" y="390" text-anchor="middle">100</text>
+      <text x="570" y="390" text-anchor="middle">120</text>
+      <text x="18" y="374" text-anchor="end">0</text>
+      <text x="18" y="322" text-anchor="end">0.00005</text>
+      <text x="18" y="270" text-anchor="end">0.00010</text>
+      <text x="18" y="218" text-anchor="end">0.00015</text>
+      <text x="18" y="167" text-anchor="end">0.00020</text>
+      <text x="18" y="113" text-anchor="end">0.00025</text>
+      <text x="18" y="70" text-anchor="end">0.00030</text>
+    </g>
+
+    <text x="290" y="430" text-anchor="middle" class="axis-label">Epoch</text>
+    <text x="-210" y="-35" transform="rotate(-90)" text-anchor="middle" class="axis-label">learning rate</text>
+    <text x="396" y="388" text-anchor="middle" class="tick" style="font-size: 13px;">end of warmup</text>
+  </g>
+
+  <g transform="translate(1365,80)">
+    <text x="250" y="0" text-anchor="middle" class="panel-title">Target-encoder EMA momentum</text>
+    <rect x="0" y="25" width="620" height="370" fill="none" stroke="#8a8a8a" stroke-width="1"/>
+
+    <g class="grid">
+      <line x1="70" y1="70" x2="570" y2="70"/>
+      <line x1="70" y1="120" x2="570" y2="120"/>
+      <line x1="70" y1="170" x2="570" y2="170"/>
+      <line x1="70" y1="220" x2="570" y2="220"/>
+      <line x1="70" y1="270" x2="570" y2="270"/>
+      <line x1="70" y1="320" x2="570" y2="320"/>
+      <line x1="70" y1="370" x2="570" y2="370"/>
+      <line x1="70" y1="70" x2="70" y2="370"/>
+      <line x1="120" y1="70" x2="120" y2="370"/>
+      <line x1="170" y1="70" x2="170" y2="370"/>
+      <line x1="220" y1="70" x2="220" y2="370"/>
+      <line x1="270" y1="70" x2="270" y2="370"/>
+      <line x1="320" y1="70" x2="320" y2="370"/>
+      <line x1="370" y1="70" x2="370" y2="370"/>
+      <line x1="420" y1="70" x2="420" y2="370"/>
+      <line x1="470" y1="70" x2="470" y2="370"/>
+      <line x1="520" y1="70" x2="520" y2="370"/>
+      <line x1="570" y1="70" x2="570" y2="370"/>
+    </g>
+
+    <g class="axis">
+      <line x1="70" y1="70" x2="570" y2="70"/>
+      <line x1="70" y1="70" x2="70" y2="370"/>
+      <line x1="70" y1="370" x2="570" y2="370"/>
+      <line x1="570" y1="70" x2="570" y2="370"/>
+    </g>
+
+    <path class="line" d="M70,330 L110,308 L150,286 L190,256 L230,226 L270,195 L310,160 L350,125 L390,92 L430,95 L470,150 L510,215 L570,280"/>
+
+    <g class="tick">
+      <text x="70" y="390" text-anchor="middle">20</text>
+      <text x="170" y="390" text-anchor="middle">40</text>
+      <text x="270" y="390" text-anchor="middle">60</text>
+      <text x="370" y="390" text-anchor="middle">80</text>
+      <text x="470" y="390" text-anchor="middle">100</text>
+      <text x="570" y="390" text-anchor="middle">120</text>
+      <text x="18" y="374" text-anchor="end">0.960</text>
+      <text x="18" y="322" text-anchor="end">0.965</text>
+      <text x="18" y="270" text-anchor="end">0.970</text>
+      <text x="18" y="218" text-anchor="end">0.975</text>
+      <text x="18" y="167" text-anchor="end">0.980</text>
+      <text x="18" y="113" text-anchor="end">0.985</text>
+      <text x="18" y="70" text-anchor="end">0.990</text>
+    </g>
+
+    <text x="290" y="430" text-anchor="middle" class="axis-label">Epoch</text>
+    <text x="-210" y="-35" transform="rotate(-90)" text-anchor="middle" class="axis-label">momentum</text>
+  </g>
+</svg>
