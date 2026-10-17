@@ -20,30 +20,29 @@ This project implements a self-supervised representation learning system based o
 - Implementation of the context encoder, EMA-updated target encoder, and predictor network.
 - Implementation of the multi-block masking strategy and latent-space prediction objective.
 
-## Timeline
-
-The project follows a progressive learning and implementation pipeline:
-
-- **Theoretical Learning:** Learned about Neural Networks, Vision Transformers (ViTs), self-supervised learning, contrastive methods (SimCLR, MoCo), masked image modeling (MAE), and Joint-Embedding Predictive Architectures (JEPA).
-- **Patch Tokenization:** Divided each input image into non-overlapping patches and linearly projected them into patch embeddings with positional encodings, forming the input sequence for the transformer.
-- **Multi-Block Masking Strategy:** Sampled a large-scale context block and several target blocks from each image, ensuring that the context is informative and spatially distributed while the target blocks are sufficiently large to carry semantic meaning.
-- **Context Encoder:** Implemented a ViT that processes only the visible context patches to produce context representations.
-- **Target Encoder:** Built a ViT with the same architecture as the context encoder, updated via an Exponential Moving Average (EMA) of the context encoder weights, to produce target representations from the full image (no gradient flow).
-- **Predictor Network:** Designed a lightweight narrow ViT that takes the context representations along with positional mask tokens and predicts the target block representations in latent space.
-- **Latent-Space Prediction Training:** Trained the model using an smooth L1 loss between predicted and target representations in embedding space, avoiding pixel-level reconstruction and learning semantic features instead.
-- **Collapse Prevention:** Relied on the asymmetric architecture, EMA updates, and stop-gradient on the target branch to prevent representation collapse without needing negative samples or hand-crafted augmentations.
--  **Evaluation**: Linear Probe and kNN over STL-10 dataset on frozen encoder.
 
 ## Dataset and Preprocessing
 
 ### Dataset:
-- Source: STL-10 (Self-Taught Learning 10), a benchmark dataset from Stanford, inspired by CIFAR-10 and designed specifically for unsupervised and self-supervised representation learning.
-- Structure: The dataset contains 113,000 color images at 96×96 resolution, split as follows:
+1.  **Source:** STL-10 (Self-Taught Learning 10), a benchmark dataset from Stanford, inspired by CIFAR-10 and designed specifically for unsupervised and self-supervised representation learning.
+- **Structure:** The dataset contains 113,000 color images at 96×96 resolution, split as follows:
     - Unlabeled set: 100,000 images used for self-supervised pretraining (I-JEPA training, no labels needed).
     - Training set: 5,000 labeled images (500 per class, 10 classes) used for linear probing and fine-tuning.
     - Test set: 8,000 labeled images (800 per class) used for final evaluation.
     - Classes: 10 object categories: airplane, bird, car, cat, deer, dog, horse, monkey, ship, and truck.
 - Notes: The unlabeled set is drawn from a broader distribution than the labeled classes (it includes additional animals and vehicles), which makes it a good test of how well the learned representations generalize. Images are sourced from ImageNet.
+
+2. ImageNet-1K (Large-Scale Dataset)
+
+- **Source:** ImageNet Large Scale Visual Recognition Challenge (ILSVRC-2012), the standard benchmark used in the original I-JEPA paper.
+- **Structure:** The dataset contains about 1.4 million color images of varying resolution (typically resized to 224×224 for ViT input), split as follows:
+  - Training set: about 1.28 million images (roughly 1,300 per class), used for self-supervised pretraining (labels ignored).
+  - Validation set: 50,000 labeled images (50 per class), used for linear probing and final evaluation.
+  - Classes: 1,000 object categories covering animals, vehicles, household objects, food, and more.
+- Notes: With 224×224 inputs and 16×16 patches, each image becomes a 14×14 grid of 196 patches. Because of its scale and diversity, ImageNet-1K is the standard test of whether the learned representations transfer to a wide range of categories.
+
+
+
 ### Preprocessing Pipeline:
 
 - Data Loading & Parsing
@@ -54,7 +53,7 @@ The project follows a progressive learning and implementation pipeline:
     - Applied light augmentation: random resized cropping and horizontal flipping. I-JEPA does not rely on heavy hand-crafted augmentations such as color jitter or rotation, since the masking strategy provides the learning signal.
     - Converted images to tensors and normalized them to the range [-1, 1].
 -  Patchification
-    - Split each image into non-overlapping patches (e.g., 8×8 for 96×96 images, giving a 12×12 grid of 144 patches).
+    - Split each image into non-overlapping patches (e.g., 8×8 for 96×96 images, giving a 12×12 grid of 144 patches or 16x16 for 224x224 images, 196 patches).
     - Linearly projected patches into embeddings and added positional encodings.
     - Stored the patch grid dimensions for use by the masking module.
 - Multi-Block Mask Generation
@@ -156,8 +155,8 @@ This ensures that the predicted embeddings of masked regions match the target en
 **Linear Probe**
 - The pretrained target (or context) encoder is **frozen**.
 - Patch representations are average-pooled into one global image vector.
-- A single linear layer maps the vector to the 10 STL-10 classes.
-- Trained with cross-entropy on the 5,000 labeled training images and evaluated on the 8,000 test images.
+- A single linear layer maps the vector to the 10 STL-10 (or 1000 ImageNet) classes.
+- Trained with cross-entropy on the labeled training images and evaluated on the test images.
 
 **Optional Fine-Tuning**
 - The encoder is unfrozen and trained end-to-end with a small learning rate along with the classification head.
