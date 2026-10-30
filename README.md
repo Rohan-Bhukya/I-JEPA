@@ -1,6 +1,6 @@
 # Self-Supervised Visual Understanding from  Masked Images (I-JEPA)
 <p align="center">
-  <img src="images_added/image.png" alt="Cover pic" width="600">
+  <img src="Images_added/image.png" alt="Cover pic" width="600">
 </p>
 
 ## Overview 
