@@ -1,11 +1,16 @@
 # Self-Supervised Visual Understanding from  Masked Images (I-JEPA)
-
-
-## Overview 
-This project implements a self-supervised representation learning system based on the *Image-based Joint-Embedding Predictive Architecture (I-JEPA)*. The system learns rich visual representations by predicting masked target regions from a single context block, operating entirely in latent/embedding space rather than pixel space.
 <p align="center">
   <img src="Images_added/image.png" alt="Cover pic" width="400">
 </p>
+
+## Overview 
+This project implements a self-supervised representation learning system based on the *Image-based Joint-Embedding Predictive Architecture (I-JEPA)*. The system learns rich visual representations by predicting masked target regions from a single context block, operating entirely in latent/embedding space rather than pixel space.
+
+### Expected Outcomes
+<p align="center">
+  <img src="Images_added/dog.png" alt="Cover pic" width="400">
+</p>
+
 
 ## Table of Contents
 - [Objective](#objective)
@@ -111,6 +116,10 @@ Context Representations + Positional Mask Tokens → Predictor → Predicted Tar
 
 The model learns to "fill in the blanks" in representation space rather than pixel space. Given a partial view of an image (the context), it predicts what the abstract features of the hidden regions (the targets) should look like. For example, if the context shows the body and legs of a horse, the predictor should produce an embedding for the hidden head region that is semantically consistent with "horse head", without needing to reconstruct exact pixels, textures, or colors. This pushes the encoder toward high-level semantics instead of low-level detail.
 
+<p align="center">
+  <img src="Images_added/I_JEPA Summer_Intern_Project.png" alt="Cover pic" width="500">
+</p>
+
 ### Mathematical Formulation
 
 **Context Encoder:**
@@ -192,8 +201,8 @@ This ensures that the predicted embeddings of masked regions match the target en
 <p align="center">
   <table>
     <tr>
-      <td><img src="Images_added/Your paragraph text (3).png" alt="First Image" width="250"></td>
-      <td><img src="Images_added/Your paragraph text.png" alt="Second Image" width="250"></td>
+      <td><img src="Images_added/Your paragraph text (3).png" alt="First Image" width="350"></td>
+      <td><img src="Images_added/Your paragraph text.png" alt="Second Image" width="350"></td>
     </tr>
   </table>
 </p>
