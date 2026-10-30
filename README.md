@@ -1,5 +1,8 @@
 # Self-Supervised Visual Understanding from  Masked Images (I-JEPA)
-![Cover_pic](Images_added/image.png)
+<p align="center">
+  <img src="images_added/image.png" alt="Cover pic" width="600">
+</p>
+
 ## Overview 
 This project implements a self-supervised representation learning system based on the *Image-based Joint-Embedding Predictive Architecture (I-JEPA)*. The system learns rich visual representations by predicting masked target regions from a single context block, operating entirely in latent/embedding space rather than pixel space.
 
