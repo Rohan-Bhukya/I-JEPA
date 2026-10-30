@@ -6,7 +6,6 @@
 ## Overview 
 This project implements a self-supervised representation learning system based on the *Image-based Joint-Embedding Predictive Architecture (I-JEPA)*. The system learns rich visual representations by predicting masked target regions from a single context block, operating entirely in latent/embedding space rather than pixel space.
 
-
 ## Table of Contents
 - [Objective](#objective)
 - [Approach](#approach)
@@ -15,6 +14,7 @@ This project implements a self-supervised representation learning system based o
 - [Results](#results)
 - [Applications](#applications) 
 - [Learning outcomes](#learning_outcomes)
+- [Repository Structure](#repositry_structure)
 - [References](#references)
 
 ## Objective
@@ -151,7 +151,7 @@ where `sg(·)` is the stop-gradient operator and \(m\) is the EMA momentum, typi
 \hat{s}_y^{(i)} = g_\phi(s_x, m_j \mid j \in B_i)
 ```
 
-The predictor uses the context representations and mask tokens with positional embeddings to predict the representations of the target regions.
+The predictor uses context representations and mask tokens with positional embeddings to predict target-region representations.
 
 Here, \(B_i\) is the \(i\)-th target block, and \(m_j\) represents a mask token associated with target patch \(j\).
 
@@ -182,7 +182,7 @@ L2 loss measures the squared difference between predicted and target embeddings.
 The objective is to make the predicted embeddings of masked regions match the target encoder's embeddings. This encourages the context encoder to learn useful visual representations by capturing relationships between visible and masked regions.
 
 The asymmetric architecture, predictor, stop-gradient operation, and EMA target encoder help stabilize representation learning without requiring negative samples.
-This ensures that the predicted embeddings of masked regions match the target encoder's embeddings of those regions, forcing the context encoder to capture meaningful semantic structure. Collapse is avoided through the asymmetric design (predictor + EMA + stop-gradient) rather than negative samples.
+This ensures that the predicted embeddings of masked regions match the target encoder's embeddings of those regions, forcing the context encoder to capture meaningful semantic structure. The asymmetric design (predictor + EMA + stop-gradient) avoids collapse rather than negative samples.
 
 ---
 
@@ -194,8 +194,11 @@ This ensures that the predicted embeddings of masked regions match the target en
 - A single linear layer maps the vector to the 10 STL-10 (or 1000 ImageNet) classes.
 - Trained with cross-entropy on the labeled training images and evaluated on the test images.
 
-**Optional Fine-Tuning**
-- The encoder is unfrozen and trained end-to-end with a small learning rate along with the classification head.
+**k-Nearest Neighbours (k-NN)**
+-  Used the trained I-JEPA encoder to extract feature representations from images without updating model weights.
+-  Computed cosine similarity between image embeddings to identify the nearest neighbours.
+-  Predicted image classes through weighted voting among the nearest neighbours (k=20).
+-  Measured classification accuracy on the test set to assess the quality of learned visual representations.
 
 ---
 
@@ -229,6 +232,7 @@ This ensures that the predicted embeddings of masked regions match the target en
 - Pretraining pipeline producing transferable representations without labelled data
 -Developed understanding of SSL, JEPA, ViT, EMA teacher-student training, masking strategies, latent-space prediction code implementation, and evaluation.
 
+## Repository Structure
 
 ## References 
 
