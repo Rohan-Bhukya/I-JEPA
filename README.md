@@ -5,14 +5,14 @@ This project implements a self-supervised representation learning system based o
 
 
 ## Table of Contents
-- Objective
+- [Objective](## Objective)
 - Approach
-- Dataset and preprocessing
-- Architecture overview
-- Results
-- Applications
-- Learning outcomes
-- References
+- [Dataset and preprocessing](## Dataset and Preprocessing)
+- [Architecture overview](## Architecture Overview)
+- [Results](## Results)
+- [Applications](## Applications) 
+- [Learning outcomes](## Learning Outcomes)
+- [References](## References)
 
 ## Objective
 - Functional I-JEPA model that learns visual representations through self-supervised joint-embedding prediction.
@@ -214,5 +214,8 @@ This ensures that the predicted embeddings of masked regions match the target en
 3. [PyTorch Official Documentation](https://pytorch.org/)
 4. [Official implementation](https://github.com/facebookresearch/ijepa)
 
-
+## Project Members
+1. [Krishika Kohad](https://github.com/krishikakohad3001)
+2. [Bhukya Rohan](https://github.com/Rohan-Bhukya)
+3. [Hrishikesh Chobe](https://github.com/hrcgitgood-146146)
 
