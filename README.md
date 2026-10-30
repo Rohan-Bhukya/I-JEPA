@@ -14,7 +14,6 @@ This project implements a self-supervised representation learning system based o
 - [Results](#results)
 - [Applications](#applications) 
 - [Learning outcomes](#learning_outcomes)
-- [Repository Structure](#repositry_structure)
 - [References](#references)
 
 ## Objective
@@ -231,8 +230,6 @@ This ensures that the predicted embeddings of masked regions match the target en
 - Implemented a multi-block masking strategy and latent-space prediction objective.
 - Pretraining pipeline producing transferable representations without labelled data
 -Developed understanding of SSL, JEPA, ViT, EMA teacher-student training, masking strategies, latent-space prediction code implementation, and evaluation.
-
-## Repository Structure
 
 ## References 
 
