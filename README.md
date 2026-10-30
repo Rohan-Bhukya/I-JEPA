@@ -9,7 +9,7 @@ This project implements a self-supervised representation learning system based o
 
 ## Table of Contents
 - [Objective](#objective)
-- Approach
+- [Approach](#approach)
 - [Dataset and preprocessing](#Dataset-and-Preprocessing)
 - [Architecture overview](#architecture-overview)
 - [Results](#results)
@@ -22,6 +22,14 @@ This project implements a self-supervised representation learning system based o
 - Implementation of the context encoder, EMA-updated target encoder, and predictor network.
 - Implementation of the multi-block masking strategy and latent-space prediction objective.
 
+## Approach
+- Data: Started with STL-10 for pretraining, with no labels used. Later shifted to ImageNet-100. Tested on a smaller dataset, then pretrained on a larger one to improve results. 
+- Model: Reimplemented I-JEPA in PyTorch with a ViT-Small encoder, a narrow ViT predictor with a learnable mask token, and an EMA target encoder.
+- Masking: Multi-block masking samples one large context block and several target blocks. The target blocks are removed from the context.
+- Objective: The predictor predicts the target encoder’s features for the masked blocks, and the loss is L2 in feature space. Targets are layer-normalised, and gradients are stopped on the target encoder. There is no pixel decoder.
+- Optimisation: AdamW with warmup + cosine LR, cosine weight-decay schedule, and a linear EMA momentum schedule.
+- Evaluation: The encoder is frozen. We run a linear probe and a kNN classifier on average-pooled patch features. A random-init encoder is the baseline.
+- Results: Using a pretrained decoder model, we tried to visualize our predictions after training the model.
 
 ## Dataset and Preprocessing
 
