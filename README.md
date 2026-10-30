@@ -15,6 +15,7 @@ This project implements a self-supervised representation learning system based o
 - [Applications](#applications) 
 - [Learning outcomes](#learning_outcomes)
 - [References](#references)
+- [Project Members](#project_members)
 
 ## Objective
 - Functional I-JEPA model that learns visual representations through self-supervised joint-embedding prediction.
