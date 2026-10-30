@@ -40,7 +40,7 @@ This project implements a self-supervised representation learning system based o
     - Training set: 5,000 labeled images (500 per class, 10 classes) used for linear probing and fine-tuning.
     - Test set: 8,000 labeled images (800 per class) used for final evaluation.
     - Classes: 10 object categories: airplane, bird, car, cat, deer, dog, horse, monkey, ship, and truck.
-    - 
+  
 2. ImageNet-100
 - Structure: ImageNet-100 is a 100-class subset of ImageNet, containing approximately 130,000 images, split as follows:
 - Training set: Approximately 120,000 labeled images across 100 classes, used for training or self-supervised pretraining (labels are ignored during I-JEPA pretraining).
